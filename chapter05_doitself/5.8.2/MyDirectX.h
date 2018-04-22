@@ -42,8 +42,8 @@ void DrawSurface(LPDIRECT3DSURFACE9 dest,float x,float y,LPDIRECT3DSURFACE9 sour
 
 // DirectInput objects,device and states
 extern LPDIRECTINPUT dinput;
-extern LPDIRECTINPUTDEVICE dimouse;
-extern LPDIRECTINPUTDEVICE dikeyboard;
+extern LPDIRECTINPUTDEVICEA dimouse;
+extern LPDIRECTINPUTDEVICEA dikeyboard;
 extern DIMOUSESTATE mouse_state;
 extern char keys[256];
 
@@ -51,7 +51,6 @@ extern char keys[256];
 bool DirectInput_Init(HWND window);
 void DirectInput_Update();
 void DirectInput_Shutdown();
-
 int Key_Down(int key);
 
 // Game functions

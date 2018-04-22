@@ -23,7 +23,6 @@ struct BUCKET{
 
 BUCKET bucket;
 int score = 0;
-int vibrating = 0;
 
 bool Game_Init(HWND window){
 	Direct3D_Init(window,SCREENW,SCREENH,true);
@@ -78,7 +77,7 @@ void KeepInScreen(){
 }
 
 void MovedByKeyBoard(){
-	const float move_pixel = 3.0f;
+	const float move_pixel = 6.0f;
 	if (Key_Down(DIK_W)){
 		bucket.y -= move_pixel;
 	}
@@ -98,22 +97,35 @@ void CheckCollide(HWND window,struct BOMB * bomb){
 	int cy = (int)(*bomb).y + 64;
 	if (cx > bucket.x && cx < bucket.x + 128 &&
 		cy > bucket.y && cy < bucket.y + 128){
+		score++;
+		std::ostringstream os;
+		os << APPTITLE << " score: " << score;
+		string scoreSr = os.str();
+		SetWindowText(window,scoreSr.c_str());
 		(*bomb).reset();
 	}
 }
-void Game_Run(HWND window){
-	if (!d3ddev) return;
-	DirectInput_Update();
-	bomb.y += 2.0f;
-	bomb1.y += 1.0f;
-	if (bomb.y > SCREENH){
-		MessageBox(window,"Oh,no,the bomb exploded","YOU STINK",0);
-		gameover = true;
-	}
-	if (bomb1.y > SCREENH){
+void BombOutOfRange(HWND window,struct BOMB * bomb){
+	if (bomb->y > SCREENH){
 		MessageBox(window, "Oh,no,the bomb exploded", "YOU STINK", 0);
 		gameover = true;
 	}
+}
+void BombMove(struct BOMB * bomb, float downSpeed){
+	bomb->y += downSpeed;
+}
+void Game_Run(HWND window){
+	if (!d3ddev) return;
+	// 获取键盘输入
+	DirectInput_Update();
+
+	// 炸弹的运动
+	BombMove(&bomb, 1.0f);
+	BombMove(&bomb1, 2.0f);
+
+	// 判断炸弹没接到
+	BombOutOfRange(window,&bomb);
+	BombOutOfRange(window,&bomb1);
 
 	// 根据键盘移动物体
 	MovedByKeyBoard();
@@ -126,7 +138,6 @@ void Game_Run(HWND window){
 	CheckCollide(window,&bomb1);
 
 	d3ddev->ColorFill(backbuffer, NULL, D3DCOLOR_XRGB(0, 0, 0));
-
 	if (d3ddev->BeginScene()){
 		DrawSurface(backbuffer, bomb.x, bomb.y, bomb_surf);
 		DrawSurface(backbuffer, bomb1.x, bomb1.y, bomb_surf1);
